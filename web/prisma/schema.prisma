@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id
+  language     String   @default("ar")
+  timezone     String   @default("Asia/Damascus")
+  createdAt    DateTime @default(now())
+  subscription Subscription?
+  devices      Device[]
+  proxies      Proxy[]
+  plans        ScheduledPlan[]
+  ledger       FinancialLedger[]
+  referrals    Referral[]
+}
+
+model CatalogGame {
+  id        String @id
+  title     String
+  os        String
+  platform  String?
+  templates Json
+}
+
+model Subscription {
+  userId     String   @id
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  state      String   @default("new")
+  tier       String?
+  expiresAt  DateTime?
+  graceUntil DateTime?
+  queue      Json     @default("[]")
+  used       Int      @default(0)
+  windowStart DateTime?
+}
+
+model Device {
+  id         String @id
+  userId     String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  os         String
+  gaid       String?
+  idfa       String?
+  idfv       String?
+  proxyId    String?
+  linked     LinkedGame[]
+  plans      ScheduledPlan[]
+}
+
+model LinkedGame {
+  id      String @id
+  deviceId String
+  device  Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  gameId  String
+  uid     String
+  singular String?
+}
+
+model Proxy {
+  id     String @id
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint String
+  label  String?
+  check  Json?
+}
+
+model ScheduledPlan {
+  id      String @id
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceId String
+  device  Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  mode    String
+  operations Json
+  sharedInterval Int?
+}
+
+model PlanCounter {
+  id       String @id
+  userId   String
+  deviceId String
+  linkedId String?
+  count    Int    @default(0)
+}
+
+model FinancialLedger {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount  Float
+  kind    String
+  note    String?
+  createdAt DateTime @default(now())
+}
+
+model Referral {
+  id         String @id @default(cuid())
+  referrerId String
+  referrer   User   @relation(fields: [referrerId], references: [id], onDelete: Cascade)
+  referredId String @unique
+  createdAt  DateTime @default(now())
+}
