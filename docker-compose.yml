@@ -1,0 +1,47 @@
+services:
+  web:
+    build: ./web
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://telebt:${DB_PASSWORD}@db:5432/telebt?schema=public
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/login"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: telebt
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: telebt
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U telebt -d telebt"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      BOT_USERNAME: ${BOT_USERNAME}
+      SUPPORT_LINK_1: ${SUPPORT_LINK_1}
+      SUPPORT_LINK_2: ${SUPPORT_LINK_2}
+      DEV_MODE: ${DEV_MODE:-false}
+      DEV_TELEGRAM_USER_IDS: ${DEV_TELEGRAM_USER_IDS}
+    volumes:
+      - bot_data:/app/mock_data
+volumes:
+  pgdata:
+  bot_data:
