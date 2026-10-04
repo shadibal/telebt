@@ -2,10 +2,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from telebt.services import MockServices
-from telebt.storage import JsonStore
-from telebt.ui import BotUI
-from telebt.locale import TEXT
+from telebt.data.services import MockServices
+from telebt.data.storage import JsonStore
+from telebt.bot.ui import BotUI
+from telebt.core.locale import TEXT
 
 
 UUID = "12345678-1234-1234-1234-123456789abc"

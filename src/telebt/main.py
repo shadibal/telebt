@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from .config import load_settings
-from .telegram_adapter import build_application
+from .bot.telegram_adapter import build_application
 
 
 def main() -> None:

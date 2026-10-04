@@ -3,10 +3,10 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from telebt.services import MockServices, PermissionError
-from telebt.storage import JsonStore
-from telebt.ui import BotUI
-from telebt.validation import ValidationError
+from telebt.data.services import MockServices, PermissionError
+from telebt.data.storage import JsonStore
+from telebt.bot.ui import BotUI
+from telebt.core.validation import ValidationError
 
 
 UUID = "abcdef12-1234-1234-abcd-123456789abc"

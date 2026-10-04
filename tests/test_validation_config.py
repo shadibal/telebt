@@ -7,9 +7,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 from telebt.config import load_settings
-from telebt.schedule import due_dates
-from telebt.telegram_adapter import build_application
-from telebt.validation import DEFAULT_VALIDATION_RULES, ValidationError, identifier, interval
+from telebt.core.schedule import due_dates
+from telebt.bot.telegram_adapter import build_application
+from telebt.core.validation import DEFAULT_VALIDATION_RULES, ValidationError, identifier, interval
 
 
 UUID = "ABCDEF12-1234-1234-ABCD-123456789ABC"

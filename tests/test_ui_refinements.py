@@ -8,12 +8,12 @@ from unittest.mock import AsyncMock, patch
 
 from telegram.error import BadRequest, NetworkError
 
-from telebt.locale import TEXT
-from telebt.services import MockServices
-from telebt.storage import JsonStore
-from telebt.telegram_adapter import keyboard
-from telebt.ui import BotUI
-from telebt.validation import ValidationError
+from telebt.core.locale import TEXT
+from telebt.data.services import MockServices
+from telebt.data.storage import JsonStore
+from telebt.bot.telegram_adapter import keyboard
+from telebt.bot.ui import BotUI
+from telebt.core.validation import ValidationError
 from test_telegram_timeline import Timeline, IDFA, IDFV
 
 
@@ -80,7 +80,7 @@ class PlanPresentationTests(unittest.TestCase):
                         self.assertEqual(review.kind, "plan_review")
                         self.assertIn("plan:confirm", [b.data for b in review.buttons])
                         before = len(self.api.plans.list(7))
-                        with patch("telebt.services.utc_now", return_value=baseline):
+                        with patch("telebt.data.services.utc_now", return_value=baseline):
                             self.ui.click(7, "plan:confirm")
                         plans = self.api.plans.list(7)
                         self.assertEqual(len(plans), before + 1)

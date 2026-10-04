@@ -3,9 +3,9 @@ import math
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
-from .schedule import due_dates, resume_unattempted, utc_now
+from ..core.schedule import due_dates, resume_unattempted, utc_now
 from .storage import JsonStore
-from .validation import DEFAULT_VALIDATION_RULES, ValidationRules, ValidationError, endpoint, identifier, interval, render_template, required, search_key, template_fields
+from ..core.validation import DEFAULT_VALIDATION_RULES, ValidationRules, ValidationError, endpoint, identifier, interval, render_template, required, search_key, template_fields
 
 
 class PermissionError(RuntimeError):

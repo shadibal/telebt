@@ -6,8 +6,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from telebt.config import Settings
-from telebt.locale import TEXT
-from telebt.telegram_adapter import build_application
+from telebt.core.locale import TEXT
+from telebt.bot.telegram_adapter import build_application
 
 
 IDFA = "12345678-1234-1234-1234-123456789abc"

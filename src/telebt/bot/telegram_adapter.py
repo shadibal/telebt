@@ -5,9 +5,9 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import NetworkError, TelegramError
 from telegram.ext import Application, ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler, filters
 
-from .config import Settings
-from .services import MockServices
-from .storage import JsonStore, StorageError
+from ..config import Settings
+from ..data.services import MockServices
+from ..data.storage import JsonStore, StorageError
 from .ui import BotUI, Screen
 
 

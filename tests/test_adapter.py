@@ -8,13 +8,13 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 from telebt.config import Settings, load_settings
-from telebt.ui import Button, Screen
+from telebt.bot.ui import Button, Screen
 
 
 @unittest.skipUnless(importlib.util.find_spec("telegram"), "python-telegram-bot is not installed")
 class AdapterTests(unittest.TestCase):
     def test_start_after_process_restart_cleans_previous_bot_screen(self):
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
 
         with tempfile.TemporaryDirectory() as directory:
             settings = Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory))
@@ -38,7 +38,7 @@ class AdapterTests(unittest.TestCase):
             bot.delete_message.assert_awaited_once_with(chat_id=7, message_id=11)
 
     def test_application_builds_without_network_or_real_token(self):
-        from telebt.telegram_adapter import build_application, keyboard, chunks
+        from telebt.bot.telegram_adapter import build_application, keyboard, chunks
         with tempfile.TemporaryDirectory() as directory:
             config = Settings("123456:TESTTOKEN", "example_bot", ("https://t.me/example1", "https://t.me/example2"), False, frozenset(), Path(directory))
             app = build_application(config)
@@ -50,7 +50,7 @@ class AdapterTests(unittest.TestCase):
             self.assertTrue(all(len(part) <= 4 for part in chunks("abc\ndef", 4)))
 
     def test_offline_telegram_handlers_drive_both_languages_and_text_input(self):
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             settings = Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory))
             app = build_application(settings)
@@ -83,7 +83,7 @@ class AdapterTests(unittest.TestCase):
 
     def test_callback_timeout_does_not_execute_action_or_escape(self):
         from telegram.error import TimedOut
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             ui = app.bot_data["ui"]
@@ -98,7 +98,7 @@ class AdapterTests(unittest.TestCase):
 
     def test_send_network_error_is_handled_without_second_action(self):
         from telegram.error import NetworkError
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             ui = app.bot_data["ui"]
@@ -115,7 +115,7 @@ class AdapterTests(unittest.TestCase):
             self.assertEqual(send_message.await_count, 1)
 
     def test_old_callback_does_not_change_language_or_navigation(self):
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             sent = 0
@@ -137,7 +137,7 @@ class AdapterTests(unittest.TestCase):
             self.assertEqual(app.bot_data["ui"].s.users.get(7)["language"], "en")
 
     def test_callback_edits_same_screen_and_rejects_previous_keyboard_revision(self):
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             send_message = AsyncMock(side_effect=[SimpleNamespace(message_id=11), SimpleNamespace(message_id=12), SimpleNamespace(message_id=13)])
@@ -164,7 +164,7 @@ class AdapterTests(unittest.TestCase):
 
     def test_uneditable_screen_sends_replacement_and_cleans_only_old_bot_message(self):
         from telegram.error import BadRequest
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             send_message = AsyncMock(side_effect=[SimpleNamespace(message_id=11), SimpleNamespace(message_id=12)])
@@ -182,7 +182,7 @@ class AdapterTests(unittest.TestCase):
             self.assertEqual(send_message.await_count, 2)
 
     def test_text_input_sends_active_bot_screen_below_user_message(self):
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             send_message = AsyncMock(side_effect=[SimpleNamespace(message_id=i) for i in range(11, 16)])
@@ -209,7 +209,7 @@ class AdapterTests(unittest.TestCase):
 
     def test_failed_keyboard_cleanup_still_replaces_screen_and_blocks_old_button(self):
         from telegram.error import BadRequest
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             send_message = AsyncMock(side_effect=[SimpleNamespace(message_id=11), SimpleNamespace(message_id=12)])
@@ -226,7 +226,7 @@ class AdapterTests(unittest.TestCase):
             old_message.edit_reply_markup.assert_awaited_once()
 
     def test_callback_without_message_identity_cannot_change_active_screen(self):
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             send_message = AsyncMock(return_value=SimpleNamespace(message_id=11))
@@ -240,7 +240,7 @@ class AdapterTests(unittest.TestCase):
             self.assertEqual(send_message.await_count, 1)
 
     def test_long_screen_replacement_cleans_all_previous_bot_chunks(self):
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             ui = app.bot_data["ui"]
@@ -263,7 +263,7 @@ class AdapterTests(unittest.TestCase):
 
     def test_failed_long_screen_send_removes_known_partial_bot_chunk(self):
         from telegram.error import NetworkError
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             ui = app.bot_data["ui"]
@@ -275,7 +275,7 @@ class AdapterTests(unittest.TestCase):
             bot.delete_message.assert_awaited_once_with(chat_id=7, message_id=10)
 
     def test_group_chat_cannot_display_proxy_password(self):
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             send_message = AsyncMock()
@@ -286,13 +286,13 @@ class AdapterTests(unittest.TestCase):
 
     def test_disconnect_ack_and_error_handler_do_not_log_details(self):
         from telegram.error import NetworkError
-        from telebt.telegram_adapter import build_application
+        from telebt.bot.telegram_adapter import build_application
         with tempfile.TemporaryDirectory() as directory:
             app = build_application(Settings("123456:TESTTOKEN", "", ("", ""), False, frozenset(), Path(directory)))
             ui = app.bot_data["ui"]
             ui.start(7)
             update = SimpleNamespace(effective_user=SimpleNamespace(id=7), effective_chat=SimpleNamespace(type="private", send_message=AsyncMock()), callback_query=SimpleNamespace(data="lang:en", answer=AsyncMock(side_effect=NetworkError("secret credentials"))), message=None)
-            with self.assertLogs("telebt.telegram_adapter", level="WARNING") as captured:
+            with self.assertLogs("telebt.bot.telegram_adapter", level="WARNING") as captured:
                 asyncio.run(app.handlers[0][2].callback(update, SimpleNamespace()))
                 asyncio.run(next(iter(app.error_handlers))(update, SimpleNamespace(error=NetworkError("secret credentials"))))
             self.assertNotIn("secret credentials", "\n".join(captured.output))

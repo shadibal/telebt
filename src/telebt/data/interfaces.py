@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from .validation import ValidationRules
+from ..core.validation import ValidationRules
 
 
 class UserProfileService(Protocol):

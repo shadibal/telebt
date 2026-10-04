@@ -3,7 +3,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from .validation import DEFAULT_VALIDATION_RULES, ValidationRules
+from .core.validation import DEFAULT_VALIDATION_RULES, ValidationRules
 
 
 @dataclass(frozen=True)
@@ -41,7 +41,7 @@ def load_settings(project_root: Path | None = None) -> Settings:
     for link in support:
         if link and not link.startswith("https://t.me/"): raise ValueError("Support links must be https://t.me/ links")
     support = tuple("" if "/example_support_" in link else link for link in support)
-    from .services import TIERS
+    from .data.services import TIERS
     tiers = {key: dict(value) for key, value in TIERS.items()}
     for tier in tiers:
         for field in ("price", "days", "limit"):

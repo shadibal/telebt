@@ -3,11 +3,11 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from telebt.validation import identifier, interval, render_template, ValidationError
-from telebt.storage import JsonStore, StorageError
-from telebt.services import MockServices, PermissionError, add_month
-from telebt.schedule import due_dates, resume_unattempted
-from telebt.ui import BotUI
+from telebt.core.validation import identifier, interval, render_template, ValidationError
+from telebt.data.storage import JsonStore, StorageError
+from telebt.data.services import MockServices, PermissionError, add_month
+from telebt.core.schedule import due_dates, resume_unattempted
+from telebt.bot.ui import BotUI
 
 
 class CoreTests(unittest.TestCase):
