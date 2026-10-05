@@ -20,7 +20,7 @@ services:
     image: postgres:16
     environment:
       POSTGRES_USER: telebt
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in Coolify env vars}
       POSTGRES_DB: telebt
     volumes:
       - pgdata:/var/lib/postgresql/data
